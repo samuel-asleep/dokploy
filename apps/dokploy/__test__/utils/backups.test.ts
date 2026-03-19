@@ -142,13 +142,31 @@ describe("getRcloneFlags", () => {
 		expect(flags.join(" ")).not.toContain("--s3-");
 	});
 
-	test("uses default port 22 for SFTP when port is not set", () => {
+	test("uses default port 22 for SFTP when port is null", () => {
 		const dest = {
 			...sftpDestination,
 			port: null,
 		} as unknown as PartialDestination;
 		const flags = getRcloneFlags(dest);
 		expect(flags).toContain('--sftp-port="22"');
+	});
+
+	test("uses default port 22 for SFTP when port is empty string", () => {
+		const dest = {
+			...sftpDestination,
+			port: "",
+		} as unknown as PartialDestination;
+		const flags = getRcloneFlags(dest);
+		expect(flags).toContain('--sftp-port="22"');
+	});
+
+	test("uses default port 21 for FTP when port is empty string", () => {
+		const dest = {
+			...ftpDestination,
+			port: "",
+		} as unknown as PartialDestination;
+		const flags = getRcloneFlags(dest);
+		expect(flags).toContain('--ftp-port="21"');
 	});
 
 	test("returns FTP flags for ftp destination", () => {

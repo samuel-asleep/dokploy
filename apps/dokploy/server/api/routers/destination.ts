@@ -55,7 +55,7 @@ export const destinationRouter = createTRPCRouter({
 					const flags = [
 						`--sftp-host="${host}"`,
 						`--sftp-user="${username}"`,
-						`--sftp-port="${port ?? "22"}"`,
+						`--sftp-port="${port || "22"}"`,
 						`--sftp-pass="${password}"`,
 						"--retries 1",
 						"--low-level-retries 1",
@@ -69,7 +69,7 @@ export const destinationRouter = createTRPCRouter({
 					const flags = [
 						`--ftp-host="${host}"`,
 						`--ftp-user="${username}"`,
-						`--ftp-port="${port ?? "21"}"`,
+						`--ftp-port="${port || "21"}"`,
 						`--ftp-pass="${password}"`,
 						"--retries 1",
 						"--low-level-retries 1",

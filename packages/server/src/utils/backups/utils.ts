@@ -82,7 +82,7 @@ export const getRcloneFlags = (destination: Destination): string[] => {
 		const flags = [
 			`--sftp-host="${escapeShellValue(destination.host ?? "")}"`,
 			`--sftp-user="${escapeShellValue(destination.username ?? "")}"`,
-			`--sftp-port="${escapeShellValue(destination.port ?? DEFAULT_SFTP_PORT)}"`,
+			`--sftp-port="${escapeShellValue(destination.port || DEFAULT_SFTP_PORT)}"`,
 		];
 		if (destination.password) {
 			flags.push(`--sftp-pass="${escapeShellValue(destination.password)}"`);
@@ -94,7 +94,7 @@ export const getRcloneFlags = (destination: Destination): string[] => {
 		const flags = [
 			`--ftp-host="${escapeShellValue(destination.host ?? "")}"`,
 			`--ftp-user="${escapeShellValue(destination.username ?? "")}"`,
-			`--ftp-port="${escapeShellValue(destination.port ?? DEFAULT_FTP_PORT)}"`,
+			`--ftp-port="${escapeShellValue(destination.port || DEFAULT_FTP_PORT)}"`,
 		];
 		if (destination.password) {
 			flags.push(`--ftp-pass="${escapeShellValue(destination.password)}"`);
