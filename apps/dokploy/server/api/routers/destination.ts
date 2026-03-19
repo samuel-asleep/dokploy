@@ -74,6 +74,7 @@ export const destinationRouter = createTRPCRouter({
 						`--ftp-host="${host}"`,
 						`--ftp-user="${username}"`,
 						`--ftp-port="${port || "21"}"`,
+						"--ftp-disable-epsv",
 						`--ftp-pass="${obscuredPass}"`,
 						"--retries 1",
 						"--low-level-retries 1",

@@ -110,6 +110,7 @@ export const getRcloneFlags = (destination: Destination): string[] => {
 			`--ftp-host="${escapeShellValue(destination.host ?? "")}"`,
 			`--ftp-user="${escapeShellValue(destination.username ?? "")}"`,
 			`--ftp-port="${escapeShellValue(destination.port || DEFAULT_FTP_PORT)}"`,
+			"--ftp-disable-epsv",
 		];
 		if (destination.password) {
 			flags.push(`--ftp-pass="${shellObscurePassword(destination.password)}"`);
