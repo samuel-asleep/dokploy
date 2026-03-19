@@ -50,4 +50,4 @@
 	"remoteUser": "node",
 	"workspaceFolder": "/workspaces/dokploy",
 	"runArgs": ["--name", "dokploy-devcontainer"]
-}
+    }
