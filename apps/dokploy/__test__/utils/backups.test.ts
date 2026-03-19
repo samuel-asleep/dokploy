@@ -168,6 +168,7 @@ describe("getRcloneFlags", () => {
 		} as unknown as PartialDestination;
 		const flags = getRcloneFlags(dest);
 		expect(flags).toContain('--ftp-port="21"');
+		expect(flags).toContain("--ftp-disable-epsv");
 	});
 
 	test("returns FTP flags for ftp destination", () => {
@@ -175,6 +176,7 @@ describe("getRcloneFlags", () => {
 		expect(flags).toContain('--ftp-host="ftp.example.com"');
 		expect(flags).toContain('--ftp-user="ftpuser"');
 		expect(flags).toContain('--ftp-port="21"');
+		expect(flags).toContain("--ftp-disable-epsv");
 		// password must be wrapped in rclone obscure shell substitution
 		expect(flags).toContain("--ftp-pass=\"$(rclone obscure 'ftppass')\"");
 		expect(flags.join(" ")).not.toContain("--s3-");
