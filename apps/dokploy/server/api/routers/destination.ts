@@ -52,11 +52,13 @@ export const destinationRouter = createTRPCRouter({
 
 				if (input.destinationType === "sftp") {
 					const { host, port, username, password } = input;
+					// rclone requires --sftp-pass to be obscured; use shell substitution
+					const obscuredPass = `$(rclone obscure '${password.replace(/'/g, "'\\''")}')`; 
 					const flags = [
 						`--sftp-host="${host}"`,
 						`--sftp-user="${username}"`,
 						`--sftp-port="${port || "22"}"`,
-						`--sftp-pass="${password}"`,
+						`--sftp-pass="${obscuredPass}"`,
 						"--retries 1",
 						"--low-level-retries 1",
 						"--timeout 10s",
@@ -66,11 +68,13 @@ export const destinationRouter = createTRPCRouter({
 					rcloneCommand = `rclone ls ${flags.join(" ")} ":sftp:${remotePath}"`;
 				} else if (input.destinationType === "ftp") {
 					const { host, port, username, password } = input;
+					// rclone requires --ftp-pass to be obscured; use shell substitution
+					const obscuredPass = `$(rclone obscure '${password.replace(/'/g, "'\\''")}')`; 
 					const flags = [
 						`--ftp-host="${host}"`,
 						`--ftp-user="${username}"`,
 						`--ftp-port="${port || "21"}"`,
-						`--ftp-pass="${password}"`,
+						`--ftp-pass="${obscuredPass}"`,
 						"--retries 1",
 						"--low-level-retries 1",
 						"--timeout 10s",

@@ -65,6 +65,19 @@ export const normalizeS3Path = (prefix: string) => {
 const escapeShellValue = (value: string): string =>
 	value.replace(/[\\"$`]/g, "\\$&");
 
+/**
+ * Wraps a plain-text password in a shell command substitution that calls
+ * `rclone obscure` at runtime.  rclone's --ftp-pass and --sftp-pass flags
+ * require an obscured (XOR-encoded) password, not plain text.  Using `$()`
+ * keeps the obscured form out of memory and avoids storing it anywhere.
+ * The password is single-quoted so all special characters are safe; only
+ * single-quote characters inside the password need escaping.
+ */
+const shellObscurePassword = (password: string): string => {
+	const escaped = password.replace(/'/g, "'\\''");
+	return `$(rclone obscure '${escaped}')`;
+};
+
 const DEFAULT_SFTP_PORT = "22";
 const DEFAULT_FTP_PORT = "21";
 
@@ -72,8 +85,10 @@ const DEFAULT_FTP_PORT = "21";
  * Returns the rclone flags array for the given destination.
  * Supports S3-compatible, SFTP, and FTP destination types.
  *
- * Note: credentials are passed as plain-text command-line flags (consistent
- * with the existing S3 behaviour). Avoid logging the returned flags.
+ * Note: SFTP/FTP passwords are wrapped in a $(rclone obscure '...') shell
+ * substitution because rclone requires obscured (not plain-text) passwords
+ * for those transports.  The returned flags must be used inside a shell
+ * command string (e.g. passed to child_process.exec).
  */
 export const getRcloneFlags = (destination: Destination): string[] => {
 	const type = destination.destinationType ?? "s3";
@@ -85,7 +100,7 @@ export const getRcloneFlags = (destination: Destination): string[] => {
 			`--sftp-port="${escapeShellValue(destination.port || DEFAULT_SFTP_PORT)}"`,
 		];
 		if (destination.password) {
-			flags.push(`--sftp-pass="${escapeShellValue(destination.password)}"`);
+			flags.push(`--sftp-pass="${shellObscurePassword(destination.password)}"`);
 		}
 		return flags;
 	}
@@ -97,7 +112,7 @@ export const getRcloneFlags = (destination: Destination): string[] => {
 			`--ftp-port="${escapeShellValue(destination.port || DEFAULT_FTP_PORT)}"`,
 		];
 		if (destination.password) {
-			flags.push(`--ftp-pass="${escapeShellValue(destination.password)}"`);
+			flags.push(`--ftp-pass="${shellObscurePassword(destination.password)}"`);
 		}
 		return flags;
 	}

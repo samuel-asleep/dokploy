@@ -137,7 +137,8 @@ describe("getRcloneFlags", () => {
 		expect(flags).toContain('--sftp-host="sftp.example.com"');
 		expect(flags).toContain('--sftp-user="backupuser"');
 		expect(flags).toContain('--sftp-port="2222"');
-		expect(flags).toContain('--sftp-pass="s3cr3t"');
+		// password must be wrapped in rclone obscure shell substitution
+		expect(flags).toContain("--sftp-pass=\"$(rclone obscure 's3cr3t')\"");
 		// S3 flags must not be present
 		expect(flags.join(" ")).not.toContain("--s3-");
 	});
@@ -174,8 +175,22 @@ describe("getRcloneFlags", () => {
 		expect(flags).toContain('--ftp-host="ftp.example.com"');
 		expect(flags).toContain('--ftp-user="ftpuser"');
 		expect(flags).toContain('--ftp-port="21"');
-		expect(flags).toContain('--ftp-pass="ftppass"');
+		// password must be wrapped in rclone obscure shell substitution
+		expect(flags).toContain("--ftp-pass=\"$(rclone obscure 'ftppass')\"");
 		expect(flags.join(" ")).not.toContain("--s3-");
+	});
+
+	test("escapes single quotes in SFTP/FTP password for shell safety", () => {
+		const dest = {
+			...sftpDestination,
+			password: "pass'with'quotes",
+		} as unknown as PartialDestination;
+		const flags = getRcloneFlags(dest);
+		const passFlag = flags.find((f) => f.startsWith("--sftp-pass="));
+		// Single quotes are escaped via the '\'' shell idiom inside rclone obscure '...'
+		expect(passFlag).toBe(
+			"--sftp-pass=\"$(rclone obscure 'pass'\\''with'\\''quotes')\"",
+		);
 	});
 
 	test("defaults to S3 when destinationType is null", () => {
